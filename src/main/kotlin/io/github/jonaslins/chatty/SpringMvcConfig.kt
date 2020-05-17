@@ -1,4 +1,4 @@
-package io.github.chatty
+package io.github.jonaslins.chatty
 
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.CorsRegistry

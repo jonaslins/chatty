@@ -1,4 +1,4 @@
-package io.github.chatty
+package io.github.jonaslins.chatty
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

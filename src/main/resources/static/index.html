@@ -8,30 +8,42 @@
 
     <script>
         function initialize() {
+            const chatForm = document.getElementById('chat-form');
+            chatForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                $('#chat').empty()
+                $('#msg-submit').show()
+                
+                let chatRoom = $('#chat-form').find('#chat-room').val()
+                const eventSource = new EventSource('http://192.168.2.102:8080/chatty/'+chatRoom+'/subscribe');
 
-            const eventSource = new EventSource('http://192.168.2.102:8080/chatty/events');
+                eventSource.onmessage = e => {
+                    const msg = JSON.parse(e.data);
+                    let user = msg.author
+                    if(user){
+                        $('#chat').append("<div class=\"content\"><b>" + user + ": </b>" + msg.text + "</div> <time class=\"timeago\" datetime=\"" + new Date(msg.date).toISOString() + "\"></time><br><br>")
+                        $("time.timeago").timeago();
+                    }
+                };
 
-            eventSource.onmessage = e => {
-                const msg = JSON.parse(e.data);
-                let user = msg.author
-                $('#chat').append(" <div class=\"content\"><b>" + user + ": </b>" + msg.text + "</div> <time class=\"timeago\" datetime=\"" + new Date(msg.date).toISOString() + "\"></time><br><br>")
-                $("time.timeago").timeago();
-            };
+                eventSource.onopen = e => console.log('open');
+                eventSource.onerror = e => {
+                    if (e.readyState == EventSource.CLOSED) {
+                        console.log('close');
+                    } else {
+                        console.log(e);
+                    }
+                };
 
+                eventSource.addEventListener('second', function (e) {
+                    console.log('second', e.data);
+                }, false);
 
-            eventSource.onopen = e => console.log('open');
+                chatForm.addEventListener('submit', function (event) {
+                    eventSource.close()
+                });
 
-            eventSource.onerror = e => {
-                if (e.readyState == EventSource.CLOSED) {
-                    console.log('close');
-                } else {
-                    console.log(e);
-                }
-            };
-
-            eventSource.addEventListener('second', function (e) {
-                console.log('second', e.data);
-            }, false);
+            });
 
             const form = document.getElementById('msg-form');
             form.addEventListener('submit', function (event) {
@@ -43,11 +55,12 @@
                     });
 
                 $('#msg-form').find('#text').val('')
+                let chatRoom = $('#chat-form').find('#chat-room').val()
 
                 console.log(formData);
                 $.ajax({
                     type: "POST",
-                    url: "http://192.168.2.102:8080/chatty/msg",
+                    url: "http://192.168.2.102:8080/chatty/"+chatRoom+"/msg",
                     data: formData,
                     success: function(){},
                     dataType: "json",
@@ -62,8 +75,10 @@
     </script>
 </head>
 <body>
-<h1>Chat</h1>
-
+<form id="chat-form">
+    <h1>Chat <input id="chat-room" required/> <input type="submit" value="entrar"></h1></h1>
+</form>
+<br>
 <form id="msg-form">
     nickname: <input id="author" required/>
     <br>
@@ -74,7 +89,7 @@
         <div class="content"></div>
         <div class="date"></div>
     </div>
-    <input id="text" rows="3" cols="40" required > <input type="submit">
+    <input id="text" rows="3" cols="40" required> <input id="msg-submit" type="submit" hidden>
 </form>
 </body>
 </html>
