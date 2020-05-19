@@ -1,0 +1,45 @@
+<div [hidden]="submitted && false" >
+  <div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
+    <!-- Position it -->
+    <div class="overflow-auto" style="height:300px; max-height: 600px;" #scrollMe [scrollTop]="scrollMe.scrollHeight">
+
+      <!-- Then put toasts within -->
+      <div *ngFor="let sentMessage of chat" class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false"  >
+        <div class="toast-header">
+          <!-- <img src="..." class="rounded mr-2" alt="..."> -->
+          <strong class="mr-auto">{{sentMessage.author}}</strong>
+          <small class="text-muted"  timeago [date]="sentMessage.date" [live]="true">
+          </small>
+        </div>
+        <div class="toast-body">
+          {{sentMessage.text}}
+        </div>
+      </div>
+    </div>
+  </div>
+    <form (ngSubmit)="onSubmit()">
+        <div class="form-row">
+            <div class="input-group col-4">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="addon-wrapping">
+                  <svg class="bi bi-person-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                  </svg>
+                </span>
+              </div>
+              <input type="text" class="form-control" id="author" required [(ngModel)]="message.author"
+                  name="author">
+            </div>
+            <div class="input-group col-8">
+              <input id="text" required [(ngModel)]="message.text"name="text" type="text" class="form-control" placeholder="digite algo..."  aria-describedby="button-addon4">
+              <div class="input-group-append" id="button-addon4">
+                <button class="btn btn-outline-secondary" type="submit">
+                  <svg class="bi bi-cursor-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M14.082 2.182a.5.5 0 01.103.557L8.528 15.467a.5.5 0 01-.917-.007L5.57 10.694.803 8.652a.5.5 0 01-.006-.916l12.728-5.657a.5.5 0 01.556.103z" clip-rule="evenodd"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+        </div>
+    </form>
+</div>
