@@ -13,25 +13,17 @@ class ChatTopic {
 
     private val processor: FluxProcessor<Message, Message>
 
-    private val garbageCollector: Flux<Long> =
-        Flux.interval(Duration.ofSeconds(10))
+    private val garbageCollector: Flux<Long> = Flux.interval(Duration.ofSeconds(10))
 
     constructor(name: String) {
         this.name = name
-        this.processor = DirectProcessor.create<Message>()
-            .serialize()
+        this.processor = DirectProcessor.create<Message>().serialize()
         initGarbageCollector()
     }
 
     private fun initGarbageCollector() {
         garbageCollector.subscribe {
-            processor.onNext(
-                Message(
-                    "",
-                    "",
-                    LocalDateTime.now()
-                )
-            )
+            processor.onNext(Message("", "")) //TODO use an abstraction to better handle heartbeat messages
         }
     }
 
@@ -44,8 +36,10 @@ class ChatTopic {
             if (e is Message && e.author.isNotBlank()) {
                 ServerSentEvent.builder(e).build()
             } else {
-                ServerSentEvent.builder<Any>()
-                    .event("heartbeat").retry(Duration.ofSeconds(10)).build()
+                ServerSentEvent //TODO use an abstraction to better handle heartbeat messages
+                    .builder<Any>()
+                    .event("heartbeat")
+                    .build()
             }
         }
     }

@@ -6,8 +6,7 @@ import java.util.concurrent.ConcurrentHashMap
 @Service
 class ChatBroker {
 
-    private val chatRooms: ConcurrentHashMap<String, ChatTopic> =
-        ConcurrentHashMap<String, ChatTopic>()
+    private val chatRooms: ConcurrentHashMap<String, ChatTopic> = ConcurrentHashMap<String, ChatTopic>()
 
     fun getOrCreateChatRoom(name: String): ChatTopic {
         return chatRooms[name] ?: run {
