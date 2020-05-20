@@ -16,6 +16,6 @@ This is a simple chat implemented with [Server-Sent Events](https://www.baeldung
 
 ## Improvements
 
-- For some reason I don't know yet the EventSource does try to reconnect if something fails on Angular. This does not happen if you use vannila js for example.
+- For some reason I don't know yet, the EventSource does not try to reconnect to SSE endpoint if something fails on Angular. This does not happen if you use EventSource on vanilla.js for example.
 - Obviously a decent docker-compose.yml
 - Chat room removal from broker if there's no connection after a while
