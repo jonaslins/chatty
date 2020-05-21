@@ -12,7 +12,7 @@ This is a simple chat implemented with [Server-Sent Events](https://www.baeldung
 ## How to run (for now)
 
 - Execute the spring boot app api on http://localhost:8080 
-- cd into /frontend folder and run the Angular frontend with ng serve on http://localhost:4200/
+- cd into `/frontend` folder and run the Angular frontend with `ng serve` on http://localhost:4200/
 
 ## Improvements
 
