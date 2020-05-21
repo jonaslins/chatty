@@ -5,26 +5,16 @@ import reactor.core.publisher.DirectProcessor
 import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxProcessor
 import java.time.Duration
-import java.time.LocalDateTime
 
 class ChatTopic {
 
     private val name: String
-
     private val processor: FluxProcessor<Message, Message>
-
-    private val garbageCollector: Flux<Long> = Flux.interval(Duration.ofSeconds(10))
+    private val keepAliveDelay: Long = 10
 
     constructor(name: String) {
         this.name = name
         this.processor = DirectProcessor.create<Message>().serialize()
-        initGarbageCollector()
-    }
-
-    private fun initGarbageCollector() {
-        garbageCollector.subscribe {
-            processor.onNext(Message("", "")) //TODO use an abstraction to better handle heartbeat messages
-        }
     }
 
     fun sendMessage(message: Message) {
@@ -32,16 +22,20 @@ class ChatTopic {
     }
 
     fun getChatSse(): Flux<ServerSentEvent<out Any>> {
-        return processor.map { e: Any ->
-            if (e is Message && e.author.isNotBlank()) {
-                ServerSentEvent.builder(e).build()
-            } else {
-                ServerSentEvent //TODO use an abstraction to better handle heartbeat messages
+        return Flux.merge(
+            processor.map { ServerSentEvent.builder(it).build() },
+            buildKeepAliveFlux()
+        )
+    }
+
+    private fun buildKeepAliveFlux(): Flux<ServerSentEvent<Any>> {
+        return Flux.interval(Duration.ofSeconds(keepAliveDelay))
+            .map {
+                ServerSentEvent
                     .builder<Any>()
-                    .event("heartbeat")
+                    .comment("keep-alive")
                     .build()
             }
-        }
     }
 
 }
