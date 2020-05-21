@@ -27,12 +27,14 @@ export class ChatRoomService {
       eventSource.onmessage = event => {
         observer.next(event.data);
       };
+      eventSource.onopen = e => console.log('open');
       eventSource.onerror = () => {
-        if (eventSource.readyState !== eventSource.CONNECTING) {
-          observer.error('An error occurred.');
-        }
-        eventSource.close();
-        observer.complete();
+          if (eventSource.readyState == EventSource.CLOSED) {
+            eventSource.close();
+            observer.complete();
+          } else {
+            console.log(eventSource);
+          }
       };
       return () => {
         eventSource.close();
